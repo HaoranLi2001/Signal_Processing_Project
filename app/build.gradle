@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.example.android.signallab"
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.example.android.signallab"
+        minSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
+    testImplementation 'org.testng:testng:6.9.6'
+    androidTestImplementation "androidx.test:core:1.6.1"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.6.1"
+    androidTestImplementation "androidx.test.ext:truth:1.6.0"
+    androidTestImplementation "androidx.test:runner:1.6.2"
+    androidTestImplementation "androidx.test.ext:junit:1.2.1"
+    androidTestUtil "androidx.test:orchestrator:1.5.1"
+    implementation 'com.jjoe64:graphview:4.2.2'
+    implementation 'com.otaliastudios:cameraview:2.7.2'
+    implementation 'com.google.mlkit:face-detection:16.1.6'
+}
+configurations.configureEach {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"
+    }
+}
