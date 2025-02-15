@@ -122,7 +122,6 @@ public class VideoActivity extends AppCompatActivity {
         }
     }
 
-
     private void createCameraCaptureSession() {
         try {
             Surface imageSurface = imageReader.getSurface();
