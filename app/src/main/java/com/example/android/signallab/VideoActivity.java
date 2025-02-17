@@ -16,6 +16,8 @@ import android.util.Log;
 import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -63,7 +65,17 @@ public class VideoActivity extends AppCompatActivity {
 
         mainHandler = new Handler(Looper.getMainLooper());
         processedImageView = findViewById(R.id.processedImageView); // ensure that setContentView() is implemented before it
-        openCamera();
+//        openCamera();
+        // 绑定按钮
+        Button btnStart = findViewById(R.id.btnStart);
+
+        // 设置点击监听器
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCamera(); // 按下按钮后启动摄像头
+            }
+        });
     }
 
     private void openCamera() {
