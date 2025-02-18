@@ -18,6 +18,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -45,6 +46,8 @@ import android.graphics.Rect;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class VideoActivity extends AppCompatActivity {
 
@@ -58,6 +61,11 @@ public class VideoActivity extends AppCompatActivity {
     private Handler mainHandler;
     private PointF leftEyePos;
     private PointF rightEyePos;
+
+    private Handler timerHandler = new Handler(Looper.getMainLooper());
+    private Runnable stopCameraRunnable;
+    private long startTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,12 +76,18 @@ public class VideoActivity extends AppCompatActivity {
 //        openCamera();
         // 绑定按钮
         Button btnStart = findViewById(R.id.btnStart);
-
+        LinearLayout resultLayoutContainer = findViewById(R.id.resultLayout);
+        TextView tvTimer = findViewById(R.id.tvTimer);
+//        openCamera();
         // 设置点击监听器
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                resultLayoutContainer.setVisibility(View.GONE);
+                processedImageView.setVisibility(View.VISIBLE);
+                tvTimer.setVisibility(View.VISIBLE);
                 openCamera(); // 按下按钮后启动摄像头
+//                startTimer();
             }
         });
     }
