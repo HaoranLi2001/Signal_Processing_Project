@@ -71,6 +71,7 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
 
+
         mainHandler = new Handler(Looper.getMainLooper());
         processedImageView = findViewById(R.id.processedImageView); // ensure that setContentView() is implemented before it
 //        openCamera();
