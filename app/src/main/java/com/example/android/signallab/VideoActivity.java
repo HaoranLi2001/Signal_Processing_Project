@@ -1,4 +1,5 @@
 package com.example.android.signallab;
+import com.example.android.signallab.CustomImageView;
 
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -66,6 +67,14 @@ public class VideoActivity extends AppCompatActivity {
     private Runnable stopCameraRunnable;
     private long startTime;
 
+    // Getter methods for leftEyePos and rightEyePos
+    public PointF getLeftEyePos() {
+        return leftEyePos;
+    }
+
+    public PointF getRightEyePos() {
+        return rightEyePos;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,7 +218,13 @@ public class VideoActivity extends AppCompatActivity {
             drawGreenPoint(bitmap,leftEyePos);
             drawGreenPoint(bitmap,rightEyePos);
         }
+        Button startButton = findViewById(R.id.start_button);
+        startButton.setOnClickListener(v -> {
+            mcustomSurfaceView.restartGame(); // Restart the game when the button is pressed
+        });
+
     }
+
     private Bitmap yuvToRgbBitmap(Image image) {
         int width = image.getWidth();
         int height = image.getHeight();

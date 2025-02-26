@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ public class CustomImageView extends ImageView implements Runnable {
     private Paint paint;
     private List<Obstacle> obstacles;
     private boolean isRunning;
+    private boolean gameOver; // New flag to track if the game is over
     private Thread gameThread;
     private Bitmap bitmap;
     private Canvas canvas;
@@ -25,22 +27,22 @@ public class CustomImageView extends ImageView implements Runnable {
     private float obstacleSpacing = 600; // 每隔100像素生成一个障碍物
     private long startTime;
     private int obstacleIndex = 0; // 控制 sin() 变化的索引
+    private VideoActivity videoActivity;
 
     public CustomImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
         paint.setColor(Color.RED);
         obstacles = new ArrayList<>();
+        gameOver = false; // Initialize gameOver flag as false
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    public void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        // 当视图大小变化时，初始化 bitmap 和 canvas
         screenWidth = w;
         screenHeight = h;
 
-        // 延迟初始化，确保尺寸已知
         if (bitmap == null || canvas == null) {
             bitmap = Bitmap.createBitmap((int) screenWidth, (int) screenHeight, Bitmap.Config.ARGB_8888);
             canvas = new Canvas(bitmap);
@@ -63,16 +65,11 @@ public class CustomImageView extends ImageView implements Runnable {
         float baseHeight = screenHeight / 2 - 500;  // 初始障碍物高度
         obstacleIndex = 0;  // 重置障碍物索引
 
-        // 根据正弦函数生成障碍物
         for (float x = screenWidth; x < screenWidth + 500; x += obstacleSpacing) {
-            // 使用正弦函数动态调整障碍物高度
             float heightOffset = (float) (300 * Math.sin(obstacleIndex * Math.PI / 5)); // 变化量
             float newHeight = baseHeight + heightOffset;  // 计算新的障碍物高度
 
-            // 上半部分障碍物的生成，Y 坐标为 0，紧贴屏幕顶部
             obstacles.add(new Obstacle(x, 0, obstacleWidth, newHeight));
-
-            // 下半部分障碍物的生成，Y 坐标为屏幕底部，紧贴屏幕底部
             obstacles.add(new Obstacle(x, screenHeight - newHeight, obstacleWidth, newHeight));
 
             obstacleIndex++;  // 增加索引，确保每次变化
@@ -82,8 +79,10 @@ public class CustomImageView extends ImageView implements Runnable {
     @Override
     public void run() {
         while (isRunning) {
-            updateObstacles();
-            drawObstacles();
+            if (!gameOver) { // Only update the game if it's not over
+                updateObstacles();
+                drawObstacles();
+            }
             try {
                 Thread.sleep(30); // 控制帧率
             } catch (InterruptedException e) {
@@ -97,7 +96,6 @@ public class CustomImageView extends ImageView implements Runnable {
             Obstacle obstacle = obstacles.get(i);
             obstacle.x -= obstacleSpeed;
 
-            // 超出左侧屏幕，移除并在右侧生成新障碍物
             if (obstacle.x + obstacle.width < 0) {
                 obstacles.remove(i);
                 addNewObstacle();
@@ -108,38 +106,68 @@ public class CustomImageView extends ImageView implements Runnable {
     private void addNewObstacle() {
         obstacles.clear();
         float baseHeight = screenHeight / 2 - 500;  // 初始障碍物高度
-        obstacleIndex = 0;  // 重置障碍物索引
+        obstacleIndex = 0;
 
-        // 根据正弦函数生成障碍物
         for (float x = screenWidth; x < screenWidth + 500; x += obstacleSpacing) {
-            // 使用正弦函数动态调整障碍物高度
-            float heightOffset = (float) (300 * Math.sin(obstacleIndex * Math.PI / 4)); // 变化量
-            float newHeight = baseHeight + heightOffset;  // 计算新的障碍物高度
+            float heightOffset = (float) (300 * Math.sin(obstacleIndex * Math.PI / 4));
+            float newHeight = baseHeight + heightOffset;
 
-            // 上半部分障碍物的生成，Y 坐标为 0，紧贴屏幕顶部
             obstacles.add(new Obstacle(x, 0, obstacleWidth, newHeight));
-
-            // 下半部分障碍物的生成，Y 坐标为屏幕底部，紧贴屏幕底部
             obstacles.add(new Obstacle(x, screenHeight - newHeight, obstacleWidth, newHeight));
 
-            obstacleIndex++;  // 增加索引，确保每次变化
+            obstacleIndex++;
         }
     }
 
-    private void drawObstacles() {
-        // 确保 bitmap 和 canvas 已初始化
-        if (canvas != null) {
-            // 清除画布内容，设置为透明背景
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+    public List<Obstacle> getVisibleObstacles() {
+        List<Obstacle> visibleObstacles = new ArrayList<>();
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle.x + obstacle.width > 0 && obstacle.x < screenWidth &&
+                    obstacle.y + obstacle.height > 0 && obstacle.y < screenHeight) {
+                visibleObstacles.add(obstacle);
+            }
+        }
+        return visibleObstacles;
+    }
 
-            // 绘制障碍物
+    public boolean detectCollision(List<Obstacle> visibleObstacles) {
+        float middleX = 0;
+        float middleY = 0;
+        PointF leftEye = videoActivity.getLeftEyePos();
+        PointF rightEye = videoActivity.getRightEyePos();
+
+        if (leftEye != null && rightEye != null) {
+            middleX = (leftEye.x + rightEye.x) / 2;
+            middleY = (leftEye.y + rightEye.y) / 2;
+        }
+
+        for (Obstacle obstacle : visibleObstacles) {
+            if (middleX >= obstacle.x && middleX <= obstacle.x + obstacle.width &&
+                    middleY >= obstacle.y && middleY <= obstacle.y + obstacle.height) {
+                gameOver = true; // Set game over flag when collision occurs
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void drawObstacles() {
+        if (canvas != null) {
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             for (Obstacle obstacle : obstacles) {
                 canvas.drawRect(obstacle.x, obstacle.y, obstacle.x + obstacle.width, obstacle.y + obstacle.height, paint);
             }
-
-            // 更新 ImageView 显示内容
             postInvalidate(); // 刷新 ImageView
         }
+    }
+
+    public void restartGame() {
+        gameOver = false; // Reset game over flag
+        obstacles.clear(); // Clear obstacles
+        initObstacles(); // Re-initialize obstacles
+        startTime = System.currentTimeMillis(); // Reset game time
+        gameThread = new Thread(this); // Restart game thread
+        gameThread.start();
     }
 
     @Override
@@ -153,7 +181,6 @@ public class CustomImageView extends ImageView implements Runnable {
         }
     }
 
-    // 定义障碍物类
     private static class Obstacle {
         float x, y, width, height;
 
