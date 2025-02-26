@@ -5,22 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Start 按钮 -->
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:text="Start" />
-
     <!-- 用于显示图像和计时器的容器 -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="3">
 
-        <!-- 处理后的图像，填满整个容器 -->
+        <!-- 处理后的图像（背景层） -->
         <ImageView
             android:id="@+id/processedImageView"
             android:layout_width="match_parent"
@@ -28,57 +19,13 @@
             android:background="#CCCCCC"
             android:scaleType="fitCenter" />
 
-        <!-- 计时器文本，叠加在图像右上角 -->
-        <TextView
-            android:id="@+id/tvTimer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:background="@android:color/black"
-            android:padding="8dp"
-            android:layout_gravity="top|end"
-            android:layout_margin="16dp"/>
-
-        <!-- 结果面板（默认隐藏），如果需要叠加在图像上时使用 -->
-        <LinearLayout
-            android:id="@+id/resultLayout"
+        <!-- 自定义 ImageView（前景层） -->
+        <com.example.android.signallab.CustomImageView
+            android:id="@+id/customImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:background="@android:color/black"
-            android:alpha="0.8"
-            android:visibility="gone">
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"/> <!-- 确保透明背景 -->
 
-            <TextView
-                android:id="@+id/tvResult"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time: 0s  Score: 0"
-                android:textSize="22sp"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:layout_marginBottom="20dp"/>
-
-            <Button
-                android:id="@+id/btnRestart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="重新开始"
-                android:textSize="18sp"
-                android:padding="10dp"
-                android:layout_marginBottom="10dp"/>
-
-            <Button
-                android:id="@+id/btnExit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="退出"
-                android:textSize="18sp"
-                android:padding="10dp"/>
-        </LinearLayout>
     </FrameLayout>
 </LinearLayout>

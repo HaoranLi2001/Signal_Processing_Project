@@ -50,7 +50,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class VideoActivity extends AppCompatActivity {
-
+    private CustomImageView mcustomSurfaceView;
     private ImageView processedImageView;
     private CameraDevice cameraDevice;
     private CameraCaptureSession cameraCaptureSession;
@@ -70,27 +70,16 @@ public class VideoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
-
+        mcustomSurfaceView = findViewById(R.id.customImageView);
 
         mainHandler = new Handler(Looper.getMainLooper());
         processedImageView = findViewById(R.id.processedImageView); // ensure that setContentView() is implemented before it
 //        openCamera();
         // 绑定按钮
-        Button btnStart = findViewById(R.id.btnStart);
-        LinearLayout resultLayoutContainer = findViewById(R.id.resultLayout);
-        TextView tvTimer = findViewById(R.id.tvTimer);
-//        openCamera();
+
+        openCamera();
         // 设置点击监听器
-        btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resultLayoutContainer.setVisibility(View.GONE);
-                processedImageView.setVisibility(View.VISIBLE);
-                tvTimer.setVisibility(View.VISIBLE);
-                openCamera(); // 按下按钮后启动摄像头
-//                startTimer();
-            }
-        });
+
     }
 
     private void openCamera() {
